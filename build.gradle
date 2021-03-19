@@ -99,14 +99,11 @@ dependencies {
 
     testCompile "io.mockk:mockk:1.9.3"
 
-    implementation project(":dashboards")
     implementation project(":core")
     implementation project(":aws-import")
 }
 
 build.dependsOn(":docker-pssh:buildDocker")
-build.dependsOn(":docker-grafonnet:buildDocker")
-build.dependsOn(":dashboards:generateDashboards")
 
 compileKotlin {
     kotlinOptions.jvmTarget = "1.8"
@@ -168,6 +165,12 @@ buildRpm {
 
 ospackage {
     os = LINUX
+    from(projectDir.toString() + '/bin') {
+        into '/opt/tlp-cluster/bin'
+        exclude 'tlp-cluster'
+        fileMode = 0755
+    }
+
     link("/usr/local/bin/tlp-cluster", "/opt/tlp-cluster/bin/tlp-cluster" )
     link("/usr/local/bin/build_cluster.sh", "/opt/tlp-cluster/bin/build_cluster.sh" )
     link("/usr/local/bin/install_reaper.sh", "/opt/tlp-cluster/bin/install_reaper.sh" )
@@ -249,8 +252,6 @@ compileKotlin.dependsOn(copyRegion)
 
 build {
     dependsOn(":docker-cassandra-build:buildDocker")
-    dependsOn(":docker-grafonnet:buildDocker")
     dependsOn(":docker-pssh:buildDocker")
 
 }
-
